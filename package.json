@@ -3,12 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+    "prepare": "node -e \"const{spawnSync}=require('node:child_process');const r=spawnSync('git',['rev-parse','--git-dir'],{stdio:'ignore'});if(r.status===0)spawnSync('git',['config','core.hooksPath','.githooks'],{stdio:'inherit'})\"",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm build && vitest run",
+    "check": "tsc --noEmit && vite build && vitest run",
     "check:evidence": "node scripts/check-evidence.ts",
     "test": "vitest run"
   },
