@@ -1,43 +1,27 @@
 # Process overview
 
-## What I built
+## What I made
 
-Kage Run is a wordless endless sticky-ninja game. A pointer drag launches the
-ninja along a visible arc through targets, stone surfaces, ice runs, crumble
-platforms, spikes and gaps. Checkpoints become distinct numbered levels: every
-target must be cleared while one jump remains, then the next level grants a
-larger budget and a more inventive route. The run ends in a fall, spike hit, or
-spent jump budget and reports checkpoint, target, saved-jump, time and score
-statistics.
+Kage Run, a wordless endless sticky-ninja game. Drag to send the ninja on a visible arc through targets, stone, ice runs, crumbling ledges, spikes, and gaps. Checkpoints are numbered stages: clear each target with a jump left in reserve and the gate opens.
 
-## The important prompt decisions
+## The moments that mattered
 
-The complete user wording is preserved outside this repository in the root
-workspace archive: `../prompts/crit-5-verbatim.md`. This repo keeps only the
-cleaned decisions that changed the work.
+### Moment 1 — the ice that would not let go
 
-1. **Core loop.** Build a continuous Sticky Ninja Academy-inspired run around
-   drag/release trajectory launching, surface-specific movement, target hits,
-   checkpoint gates, finite jumps and score pressure. The resulting playable
-   first draft, including the focused checkpoint-rule test, is in
-   [`f4e32f5`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-Adeeth101/commit/f4e32f5).
+What happened: Landing on the slippery ice and leaving the wall while sliding one frame and then rotating and sliding forever.
 
-2. **Earlier variety.** Make progression visibly faster and introduce multiple
-   composed levels early. Add more jumps to pay for denser platforming, timed
-   crumble platforms, and an arrow that points toward the nearest live target.
-   Levels 1–3 are handcrafted routes; later sections mix those mechanics
-   procedurally. This is part of [`f4e32f5`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-Adeeth101/commit/f4e32f5).
+Instead of the obvious thing: Instead of the obvious (and simple) fix to widen the collision tolerance (how ice works) or damp the velocity (to make it look correct) I took a different approach and traced the frame order. The wall snapped the ninja to exactly wall.x - radius, which the overlap test considers not overlapping. So, the next frame, the collision resolution and ejection would happen. I added a rule to overcome the ice: having a grip on anything that is not ice takes precedence over what was underneath the ninja.
 
-3. **Fairness corrections from play.** Ice runs now have sticky catches at both
-   ends, vertical blockers leave readable routes, crumble platforms last about
-   2.4 seconds, sticky contacts win when ice and a catch overlap, and unlocked
-   checkpoint hitboxes are generous. These changes are captured in the same
-   implementation commit and protected by the passing build/test loop.
+How I knew: The ninja now parks rotation frozen and ensures Ice Has Sticky Ends, so no ice run can be made to produce the case.
 
-## Verification
+Citation: [`f4e32f5`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-Adeeth101/commit/f4e32f5)
 
-`corepack pnpm check` passes strict TypeScript, the Vite production build, and
-all 20 tests. The local preview returned HTTP 200 with the current production
-bundle after each revision. The student will add the reflection in
-`reflections/crit-5.md`.
+### Moment 2 — writing difficulty down instead of asking for it
 
+What happened: every request for "harder" either turned trivial or brutal.
+
+Instead of the obvious thing: stopped adding prompts and coded the curve — 70s lose 5 a level to a floor of 25, spare jumps from checkpoint 5 6→3, checkpoints 1–4 frozen because they already played well.
+
+How I knew: spec/game-rules.test.ts asserts the opening ramp is unchanged, the curve is monotonic, and every checkpoint gives at least one jump per target plus one for the gate. An unfair section now fails the build.
+
+Citation: [`f4e32f5`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-Adeeth101/commit/f4e32f5)
